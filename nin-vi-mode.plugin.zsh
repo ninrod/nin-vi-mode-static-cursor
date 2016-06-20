@@ -2,7 +2,23 @@
 export KEYTIMEOUT=1
 
 # Updates editor information when the keymap changes.
+# for the mintty terminal
 function zle-keymap-select() {
+  if [[ -n ${TMUX+x} ]]; then
+    if [[ $KEYMAP = vicmd ]]; then
+      # the command mode for vi: block shape
+      echo -ne "\ePtmux;\e\e[2 q\e\\"
+    else
+      # the insert mode for vi: line shape
+      echo -ne "\ePtmux;\e\e[6 q\e\\"
+    fi
+  elif [[ $KEYMAP = vicmd ]]; then
+    # the command mode for vi: block shape
+    echo -ne "\e[2 q"
+  else
+    # the insert mode for vi: line shape
+    echo -ne "\e[6 q"
+  fi
   zle reset-prompt
   zle -R
 }
