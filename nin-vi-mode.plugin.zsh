@@ -83,10 +83,17 @@ bindkey "${terminfo[kent]}" accept-line
 
 # pressing <ESC> in normal mode is bogus: you need to press 'i' twice to enter insert mode again.
 # rebinding <ESC> in normal mode to something harmless solves the problem.
-# more info here: http://superuser.com/questions/516474/escape-not-idempotent-in-zshs-vi-emulation
 nin-noop(){}
 zle -N nin-noop
 bindkey -M vicmd '\e' nin-noop
+
+# pressing <ESC> in visual mode should return zle to normal mode
+# a deactivate-region widget was added in 5.1 so this is for zsh 5.0.8
+nin-deactivate-region() {
+	REGION_ACTIVE=0
+}
+zle -N nin-deactivate-region
+bindkey -M visual '\e' nin-deactivate-region
 
 # Keypad fixes
 # 0 .
