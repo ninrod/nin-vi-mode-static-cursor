@@ -83,7 +83,10 @@ bindkey "${terminfo[kent]}" accept-line
 
 # pressing <ESC> in normal mode is bogus: you need to press 'i' twice to enter insert mode again.
 # rebinding <ESC> in normal mode to something harmless solves the problem.
-bindkey -M vicmd '\e' what-cursor-position
+# more info here: http://superuser.com/questions/516474/escape-not-idempotent-in-zshs-vi-emulation
+nin-noop(){}
+zle -N nin-noop
+bindkey -M vicmd '\e' nin-noop
 
 # Keypad fixes
 # 0 .
