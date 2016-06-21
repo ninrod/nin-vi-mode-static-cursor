@@ -87,6 +87,15 @@ nin-noop(){}
 zle -N nin-noop
 bindkey -M vicmd '\e' nin-noop
 
+# from zsh mailing lists: (my question)
+# As presently implemented, visual mode is a combination of a couple of different
+# states that can each be changed independently; the determination of
+# whether this "mode" is in effect is not made until the last instant
+# before ZLE waits for the next keystroke, and is forgotten as soon as
+# the keystroke has been consumed.  The keymap isn't even in place long
+# enough for the corresponding widget to see it; it's indistinguishable
+# from vicmd mode.
+# ------------
 # pressing <ESC> in visual mode should return zle to normal mode
 # a deactivate-region widget was added in 5.1 so this is for zsh 5.0.8
 nin-deactivate-region() {
