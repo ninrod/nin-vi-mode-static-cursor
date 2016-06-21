@@ -104,6 +104,8 @@ nin-deactivate-region() {
 zle -N nin-deactivate-region
 bindkey -M visual '\e' nin-deactivate-region
 
+bindkey -M visual 'S' quote-region
+
 # Keypad fixes
 # 0 .
 bindkey -s "^[Op" "0"
@@ -125,6 +127,7 @@ bindkey -s "^[Ol" "+"
 bindkey -s "^[OS" "-"
 bindkey -s "^[OR" "*"
 bindkey -s "^[OQ" "/"
+
 ########### vi-like copy and paste on OSx ##########
 if [ `uname` = "Darwin" ] && (($+commands[pbcopy])); then
   function cutbuffer() {
