@@ -104,9 +104,9 @@ bindkey "${terminfo[kent]}" accept-line
 
 # pressing <ESC> in normal mode is bogus: you need to press 'i' twice to enter insert mode again.
 # rebinding <ESC> in normal mode to something harmless solves the problem.
-nin-noop(){}
-zle -N nin-noop
-bindkey -M vicmd '\e' nin-noop
+# nin-noop(){}
+# zle -N nin-noop
+# bindkey -M vicmd '\e' nin-noop
 
 # from zsh mailing lists: (my question)
 # As presently implemented, visual mode is a combination of a couple of different
