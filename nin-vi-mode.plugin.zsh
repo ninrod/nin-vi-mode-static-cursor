@@ -36,15 +36,6 @@ zle -N zle-keymap-select
 bindkey -v
 
 # }}}
-# simple binds {{{
-
-autoload -Uz edit-command-line
-zle -N edit-command-line
-bindkey -M vicmd 'gs' edit-command-line
-
-bindkey -M vicmd '?' history-incremental-search-backward
-
-# }}}
 # text objects support {{{
 # since zsh 5.0.8, text objects were introduced. Let's use some of them.
 # see here for more info: http://www.zsh.org/mla/workers/2015/msg01017.html
@@ -79,6 +70,15 @@ bindkey -a cs change-surround
 bindkey -a ds delete-surround
 bindkey -a ys add-surround
 bindkey -M visual S add-surround
+
+# }}}
+# simple binds {{{
+
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd 'gs' edit-command-line
+
+bindkey -M vicmd '?' history-incremental-search-backward
 
 # }}}
 # my custom widgets {{{
