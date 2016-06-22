@@ -128,21 +128,41 @@ bindkey -M visual '\e' nin-deactivate-region
 bindkey -M visual 'S' quote-region
 
 vi-lowercase() {
-  local save_cut="$CUTBUFFER" save_cur="$CURSOR"
+  local save_cut="$CUTBUFFER" 
+  local save_cur="$CURSOR"
+
   zle .vi-change || return
   zle .vi-cmd-mode
+
   CUTBUFFER="${CUTBUFFER:l}"
-  zle .vi-put-after -n 1
-  CUTBUFFER="$save_cut" CURSOR="$save_cur"
+
+  if [[ $save_cur = '1' ]]; then
+    zle .vi-put-before -n 1
+  else
+    zle .vi-put-after -n 1
+  fi
+
+  CUTBUFFER="$save_cut" 
+  CURSOR="$save_cur"
 }
 
 vi-uppercase() {
-  local save_cut="$CUTBUFFER" save_cur="$CURSOR"
+  local save_cut="$CUTBUFFER" 
+  local save_cur="$CURSOR"
+
   zle .vi-change || return
   zle .vi-cmd-mode
+
   CUTBUFFER="${CUTBUFFER:u}"
-  zle .vi-put-after -n 1
-  CUTBUFFER="$save_cut" CURSOR="$save_cur"
+
+  if [[ $save_cur = '1' ]]; then
+    zle .vi-put-before -n 1
+  else
+    zle .vi-put-after -n 1
+  fi
+
+  CUTBUFFER="$save_cut" 
+  CURSOR="$save_cur"
 }
 
 zle -N vi-lowercase
