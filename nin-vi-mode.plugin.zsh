@@ -100,7 +100,7 @@ vi-lowercase() {
 
   CUTBUFFER="${CUTBUFFER:l}"
 
-  if [[ $save_cur = '1' ]]; then
+  if [[ $CURSOR = '0' ]]; then
     zle .vi-put-before -n 1
   else
     zle .vi-put-after -n 1
@@ -114,12 +114,14 @@ vi-uppercase() {
   local save_cut="$CUTBUFFER" 
   local save_cur="$CURSOR"
 
+  print $save_cur
+
   zle .vi-change || return
   zle .vi-cmd-mode
 
   CUTBUFFER="${CUTBUFFER:u}"
 
-  if [[ $save_cur = '1' ]]; then
+  if [[ $CURSOR = '0' ]]; then
     zle .vi-put-before -n 1
   else
     zle .vi-put-after -n 1
