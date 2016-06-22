@@ -92,10 +92,11 @@ bindkey -M vicmd '\e' nin-noop
 
 # bindkey -M visual 'S' quote-region
 
-# credits go to Oliver Kiddle who shared these upper/lower widgets.
-# I just corrected a small bug
+# credits go to Oliver Kiddle <opk@zsh.org>,
+# who personally shared these upper/lower widgets.
+# I just corrected a small bug.
 vi-lowercase() {
-  local save_cut="$CUTBUFFER" 
+  local save_cut="$CUTBUFFER"
   local save_cur="$CURSOR"
 
   zle .vi-change || return
