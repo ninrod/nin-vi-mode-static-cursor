@@ -23,6 +23,27 @@ function zle-keymap-select() {
   zle -R
 }
 
+# for the mintty terminal
+# function zle-keymap-select() {
+#   if [[ -n ${TMUX+x} ]]; then
+#     if [[ $KEYMAP = vicmd ]]; then
+#       # the command mode for vi: block shape
+#       echo -ne "\ePtmux;\e\e[2 q\e\\"
+#     else
+#       # the insert mode for vi: line shape
+#       echo -ne "\ePtmux;\e\e[6 q\e\\"
+#     fi
+#   elif [[ $KEYMAP = vicmd ]]; then
+#     # the command mode for vi: block shape
+#     echo -ne "\e[2 q"
+#   else
+#     # the insert mode for vi: line shape
+#     echo -ne "\e[6 q"
+#   fi
+#   zle reset-prompt
+#   zle -R
+# }
+
 # Ensure that the prompt is redrawn when the terminal size changes.
 TRAPWINCH() {
   zle && { zle reset-prompt; zle -R }
@@ -105,6 +126,32 @@ zle -N nin-deactivate-region
 bindkey -M visual '\e' nin-deactivate-region
 
 bindkey -M visual 'S' quote-region
+
+vi-lowercase() {
+  local save_cut="$CUTBUFFER" save_cur="$CURSOR"
+  zle .vi-change || return
+  zle .vi-cmd-mode
+  CUTBUFFER="${CUTBUFFER:l}"
+  zle .vi-put-after -n 1
+  CUTBUFFER="$save_cut" CURSOR="$save_cur"
+}
+
+vi-uppercase() {
+  local save_cut="$CUTBUFFER" save_cur="$CURSOR"
+  zle .vi-change || return
+  zle .vi-cmd-mode
+  CUTBUFFER="${CUTBUFFER:u}"
+  zle .vi-put-after -n 1
+  CUTBUFFER="$save_cut" CURSOR="$save_cur"
+}
+
+zle -N vi-lowercase
+zle -N vi-uppercase
+
+bindkey -a 'gU' vi-uppercase
+bindkey -a 'gu' vi-lowercase
+bindkey -M visual 'u' vi-lowercase
+bindkey -M visual 'U' vi-uppercase
 
 # Keypad fixes
 # 0 .
