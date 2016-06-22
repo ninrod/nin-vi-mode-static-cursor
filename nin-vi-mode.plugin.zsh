@@ -62,6 +62,7 @@ for m in visual viopp; do
 done
 
 # add support for the surround plugin emulation widget
+# due to KEYTIMEOUT set to a low number, you have to press the chords very, very fast.
 autoload -Uz surround
 zle -N delete-surround surround
 zle -N add-surround surround
@@ -91,6 +92,8 @@ bindkey -M vicmd '\e' nin-noop
 
 # bindkey -M visual 'S' quote-region
 
+# credits go to Oliver Kiddle who shared these upper/lower widgets.
+# I just corrected a small bug
 vi-lowercase() {
   local save_cut="$CUTBUFFER" 
   local save_cur="$CURSOR"
