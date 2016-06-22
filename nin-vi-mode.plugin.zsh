@@ -114,8 +114,6 @@ vi-uppercase() {
   local save_cut="$CUTBUFFER" 
   local save_cur="$CURSOR"
 
-  print $save_cur
-
   zle .vi-change || return
   zle .vi-cmd-mode
 
