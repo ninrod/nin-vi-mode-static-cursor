@@ -1,7 +1,10 @@
-# no delays for mode switching.
-export KEYTIMEOUT=1
+# no delays for mode switching.{{{
 
-# Updates editor information when the keymap changes.
+export KEYTIMEOUT=10
+
+# }}}
+# zle-keymap-select and bootstrap: Updates editor information when the keymap changes {{{
+
 # for the mintty terminal
 function zle-keymap-select() {
   if [[ -n ${TMUX+x} ]]; then
@@ -23,27 +26,6 @@ function zle-keymap-select() {
   zle -R
 }
 
-# for the mintty terminal
-# function zle-keymap-select() {
-#   if [[ -n ${TMUX+x} ]]; then
-#     if [[ $KEYMAP = vicmd ]]; then
-#       # the command mode for vi: block shape
-#       echo -ne "\ePtmux;\e\e[2 q\e\\"
-#     else
-#       # the insert mode for vi: line shape
-#       echo -ne "\ePtmux;\e\e[6 q\e\\"
-#     fi
-#   elif [[ $KEYMAP = vicmd ]]; then
-#     # the command mode for vi: block shape
-#     echo -ne "\e[2 q"
-#   else
-#     # the insert mode for vi: line shape
-#     echo -ne "\e[6 q"
-#   fi
-#   zle reset-prompt
-#   zle -R
-# }
-
 # Ensure that the prompt is redrawn when the terminal size changes.
 TRAPWINCH() {
   zle && { zle reset-prompt; zle -R }
@@ -53,13 +35,17 @@ zle -N zle-keymap-select
 
 bindkey -v
 
-# edit line with vim
+# }}}
+# simple binds {{{
+
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd 'gs' edit-command-line
 
 bindkey -M vicmd '?' history-incremental-search-backward
 
+# }}}
+# text objects support {{{
 # since zsh 5.0.8, text objects were introduced. Let's use some of them.
 # see here for more info: http://www.zsh.org/mla/workers/2015/msg01017.html
 # and here: https://github.com/zsh-users/zsh/commit/d257f0143e69c3724466c4c92f59538d2f3fffd1
@@ -84,48 +70,26 @@ for m in visual viopp; do
   done
 done
 
-############# zsh escape code fixes #############
+# add support for the surround plugin emulation widget
+autoload -Uz surround
+zle -N delete-surround surround
+zle -N add-surround surround
+zle -N change-surround surround
+bindkey -a cs change-surround
+bindkey -a ds delete-surround
+bindkey -a ys add-surround
+bindkey -M visual S add-surround
 
-# home key
-bindkey "^[[1~" beginning-of-line
-
-# end key
-bindkey "^[[4~" end-of-line
-
-# delete key
-bindkey "^[[3~" delete-char
-
-# backspace key
-bindkey "^H" backward-delete-char
-bindkey "^?" backward-delete-char
-
-# numeric keypad return (enter)
-bindkey "${terminfo[kent]}" accept-line
+# }}}
+# my custom widgets {{{
 
 # pressing <ESC> in normal mode is bogus: you need to press 'i' twice to enter insert mode again.
 # rebinding <ESC> in normal mode to something harmless solves the problem.
-# nin-noop(){}
-# zle -N nin-noop
-# bindkey -M vicmd '\e' nin-noop
+nin-noop(){}
+zle -N nin-noop
+bindkey -M vicmd '\e' nin-noop
 
-# from zsh mailing lists: (my question)
-# As presently implemented, visual mode is a combination of a couple of different
-# states that can each be changed independently; the determination of
-# whether this "mode" is in effect is not made until the last instant
-# before ZLE waits for the next keystroke, and is forgotten as soon as
-# the keystroke has been consumed.  The keymap isn't even in place long
-# enough for the corresponding widget to see it; it's indistinguishable
-# from vicmd mode.
-# ------------
-# pressing <ESC> in visual mode should return zle to normal mode
-# a deactivate-region widget was added in 5.1 so this is for zsh 5.0.8
-nin-deactivate-region() {
-	REGION_ACTIVE=0
-}
-zle -N nin-deactivate-region
-bindkey -M visual '\e' nin-deactivate-region
-
-bindkey -M visual 'S' quote-region
+# bindkey -M visual 'S' quote-region
 
 vi-lowercase() {
   local save_cut="$CUTBUFFER" 
@@ -173,6 +137,24 @@ bindkey -a 'gu' vi-lowercase
 bindkey -M visual 'u' vi-lowercase
 bindkey -M visual 'U' vi-uppercase
 
+# }}}
+# escape code fixes {{{
+
+# home key
+bindkey "^[[1~" beginning-of-line
+
+# end key
+bindkey "^[[4~" end-of-line
+
+# delete key
+bindkey "^[[3~" delete-char
+
+# backspace key
+bindkey "^H" backward-delete-char
+bindkey "^?" backward-delete-char
+
+# numeric keypad return (enter)
+bindkey "${terminfo[kent]}" accept-line
 # Keypad fixes
 # 0 .
 bindkey -s "^[Op" "0"
@@ -195,7 +177,9 @@ bindkey -s "^[OS" "-"
 bindkey -s "^[OR" "*"
 bindkey -s "^[OQ" "/"
 
-########### vi-like copy and paste on OSx ##########
+# }}}
+# vi-like copy and paste on OSx {{{
+
 if [ `uname` = "Darwin" ] && (($+commands[pbcopy])); then
   function cutbuffer() {
     zle .$WIDGET
@@ -233,3 +217,5 @@ if [ `uname` = "Darwin" ] && (($+commands[pbcopy])); then
     zle -N $widget putbuffer
   done
 fi
+
+# }}}
