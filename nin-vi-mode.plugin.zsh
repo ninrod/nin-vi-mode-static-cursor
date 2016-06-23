@@ -1,6 +1,6 @@
 # no delays for mode switching.{{{
 
-export KEYTIMEOUT=15
+export KEYTIMEOUT=5
 
 # }}}
 # zle-keymap-select and bootstrap: Updates editor information when the keymap changes {{{
