@@ -5,6 +5,12 @@ export KEYTIMEOUT=15
 # }}}
 # zle-keymap-select and bootstrap: Updates editor information when the keymap changes {{{
 
+# Oliver Kiddle <opk@zsh.org> optimization:
+# If you change the cursor shape, consider taking care to reset it when
+# not in ZLE. zle-line-finish is only run when ZLE is succcessful so the
+# best place for the reset is in POSTEDIT:
+POSTEDIT+=$'\e[2 q'
+
 # for the mintty terminal
 function zle-keymap-select() {
   if [[ -n ${TMUX+x} ]]; then
@@ -25,6 +31,7 @@ function zle-keymap-select() {
   zle reset-prompt
   zle -R
 }
+
 
 # Ensure that the prompt is redrawn when the terminal size changes.
 TRAPWINCH() {
@@ -53,10 +60,11 @@ done
 
 # using select-quoted as instructed on: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/select-quoted#L6
 # expands c+motion (change inside/around + text-object) to quotes.
+# the inner for was lifted from Oliver Kiddle <opk@zsh.org>
 autoload -U select-quoted
 zle -N select-quoted
 for m in visual viopp; do
-  for c in {a,i}{\',\",\`}; do
+  for c in {a,i}"${(s..):-\'\"\`\|,./:;-=+@}"; do
     bindkey -M $m $c select-quoted
   done
 done
