@@ -81,6 +81,8 @@ bindkey -M vicmd 'gs' edit-command-line
 
 bindkey -M vicmd '?' history-incremental-search-backward
 
+bindkey -M visual 'Q' quote-region
+
 # }}}
 # my custom widgets {{{
 
