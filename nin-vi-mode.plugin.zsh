@@ -60,11 +60,9 @@ done
 
 # using select-quoted as instructed on: https://github.com/zsh-users/zsh/blob/master/Functions/Zle/select-quoted#L6
 # expands c+motion (change inside/around + text-object) to quotes.
-# the inner for was lifted from Oliver Kiddle <opk@zsh.org>
 autoload -U select-quoted
 zle -N select-quoted
 for m in visual viopp; do
-  # for c in {a,i}"${(s..):-\'\"\`\|,./:;-=+@}"; do
   for c in {a,i}{\',\",\`}; do
     bindkey -M $m $c select-quoted
   done
