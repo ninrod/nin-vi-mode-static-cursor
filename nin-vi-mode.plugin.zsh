@@ -9,30 +9,32 @@ export KEYTIMEOUT=5
 # If you change the cursor shape, consider taking care to reset it when
 # not in ZLE. zle-line-finish is only run when ZLE is succcessful so the
 # best place for the reset is in POSTEDIT:
-POSTEDIT+=$'\e[2 q'
 
 # for the iTerm2 terminal
+# escape sequence: `^[]1337;CursorShape=N^G`. N=1, vertical line, N=0, block.
+POSTEDIT+=$'\e]1337;CursorShape=0\x7'
 function zle-keymap-select() {
   if [[ -n ${TMUX+x} ]]; then
     if [[ $KEYMAP = vicmd ]]; then
       # the command mode for vi: block shape
-      echo -ne "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
+      echo -ne "\ePtmux;\e\e]1337;CursorShape=0\x7\e\\"
     else
       # the insert mode for vi: line shape
-      echo -ne "\ePtmux;\e\e]1337;CursorShape=0\x7\e\\"
+      echo -ne "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
     fi
   elif [[ $KEYMAP = vicmd ]]; then
     # the command mode for vi: block shape
-    echo -ne "\e]1337;CursorShape=1\x7"
+    echo -ne "\e]1337;CursorShape=0\x7"
   else
     # the insert mode for vi: line shape
-    echo -ne "\e]1337;CursorShape=0\x7"
+    echo -ne "\e]1337;CursorShape=1\x7"
   fi
   zle reset-prompt
   zle -R
 }
 
 # for the mintty terminal
+# POSTEDIT+=$'\e[2 q'
 # function zle-keymap-select() {
 #   if [[ -n ${TMUX+x} ]]; then
 #     if [[ $KEYMAP = vicmd ]]; then
