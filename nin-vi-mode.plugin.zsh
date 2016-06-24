@@ -12,6 +12,7 @@ export KEYTIMEOUT=5
 
 # for the iTerm2 terminal
 # escape sequence: `^[]1337;CursorShape=N^G`. N=1, vertical line, N=0, block.
+# more info here://www.iterm2.com/documentation-escape-codes.html
 POSTEDIT+=$'\e]1337;CursorShape=0\x7'
 function zle-keymap-select() {
   if [[ -n ${TMUX+x} ]]; then
