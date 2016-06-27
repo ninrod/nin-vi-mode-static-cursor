@@ -33,38 +33,22 @@ function zle-keymap-select() {
   zle reset-prompt
   zle -R
 }
+zle -N zle-keymap-select
 
-# for the mintty terminal
-# POSTEDIT+=$'\e[2 q'
-# function zle-keymap-select() {
-#   if [[ -n ${TMUX+x} ]]; then
-#     if [[ $KEYMAP = vicmd ]]; then
-#       # the command mode for vi: block shape
-#       echo -ne "\ePtmux;\e\e[2 q\e\\"
-#     else
-#       # the insert mode for vi: line shape
-#       echo -ne "\ePtmux;\e\e[6 q\e\\"
-#     fi
-#   elif [[ $KEYMAP = vicmd ]]; then
-#     # the command mode for vi: block shape
-#     echo -ne "\e[2 q"
-#   else
-#     # the insert mode for vi: line shape
-#     echo -ne "\e[6 q"
-#   fi
-#   zle reset-prompt
-#   zle -R
-# }
-
-
-
+# fix cursor shape to block
+zle-line-init() {
+  if [[ -n ${TMUX+x} ]]; then
+    echo -ne "\ePtmux;\e\e]1337;CursorShape=0\x7\e\\"
+  else
+    echo -ne "\e]1337;CursorShape=0\x7"
+  fi
+}
+zle -N zle-line-init
 
 # Ensure that the prompt is redrawn when the terminal size changes.
 TRAPWINCH() {
   zle && { zle reset-prompt; zle -R }
 }
-
-zle -N zle-keymap-select
 
 bindkey -v
 
@@ -124,8 +108,6 @@ bindkey -M visual 'Q' quote-region
 nin-noop(){}
 zle -N nin-noop
 bindkey -M vicmd '\e' nin-noop
-
-# bindkey -M visual 'S' quote-region
 
 # credits go to Oliver Kiddle <opk@zsh.org>,
 # who personally shared these upper/lower widgets.
