@@ -10,9 +10,26 @@
 # Tmux escape sequence example: "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
 # Normal shell escape sequence example: "\e]1337;CursorShape=1\x7"
 # more info here http://www.iterm2.com/documentation-escape-codes.html
-nin-cursor-shape() {
+nin-cursor-shape-iterm2() {
   local tmuxescape="\ePtmux;\e\e]1337;CursorShape=${1}\x7\e\\"
   local normalescape="\e]1337;CursorShape=${1}\x7"
+  if [[ -n ${TMUX+x} ]]; then
+    echo -ne $tmuxescape
+  else
+    echo -ne $normalescape
+  fi
+}
+
+# mintty terminal cursor shape support
+# parameters ($1)
+  # block shape: 2
+  # line shape: 6
+# tmux escape string: echo -ne "\ePtmux;\e\e[2 q\e\\"
+# normal escape string: echo -ne "\e[6 q"
+# more info: https://github.com/mintty/mintty/wiki/CtrlSeqs#cursor-style
+nin-cursor-shape-mintty() {
+  local tmuxescape="\ePtmux;\e\e[${1} q\e\\"
+  local normalescape="\e[${1} q"
   if [[ -n ${TMUX+x} ]]; then
     echo -ne $tmuxescape
   else
@@ -29,12 +46,12 @@ nin-cursor-shape() {
 # best place for the reset is in POSTEDIT:
 POSTEDIT+=$'\e]1337;CursorShape=0\x7'
 
-# manage cursor shape under different keymaps
+# manage cursor shape under different keymaps on iTerm2
 function zle-keymap-select() {
   if [[ $KEYMAP = vicmd ]]; then
-    nin-cursor-shape 0
+    nin-cursor-shape-iterm2 0
   elif [[ $KEYMAP = main ]]; then
-    nin-cursor-shape 1
+    nin-cursor-shape-iterm2 1
   fi
   # reset prompt if you use keymap mode indication
   # zle reset-prompt
@@ -44,7 +61,7 @@ zle -N zle-keymap-select
 
 # when we hit <cr> return cursor shape to block
 nin-accept-line() {
-  nin-cursor-shape 0
+  nin-cursor-shape-iterm2 0
   zle .accept-line
 }
 zle -N nin-accept-line
@@ -55,7 +72,7 @@ bindkey "^M" nin-accept-line
 
 # when we cancel the current command, return the cursor shape to block
 TRAPINT() {
-  nin-cursor-shape 0
+  nin-cursor-shape-iterm2 0
   return $(( 128 + $1 ))
 }
 
