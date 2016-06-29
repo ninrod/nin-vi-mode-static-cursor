@@ -45,6 +45,16 @@ zle-line-init() {
 }
 zle -N zle-line-init
 
+# fix cursor shape to block
+zle-line-finish() {
+  if [[ -n ${TMUX+x} ]]; then
+    echo -ne "\ePtmux;\e\e]1337;CursorShape=0\x7\e\\"
+  else
+    echo -ne "\e]1337;CursorShape=0\x7"
+  fi
+}
+zle -N zle-line-finish
+
 # Ensure that the prompt is redrawn when the terminal size changes.
 TRAPWINCH() {
   zle && { zle reset-prompt; zle -R }
