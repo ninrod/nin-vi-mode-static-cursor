@@ -1,12 +1,15 @@
 # helper functions {{{
 
 # nin-cursor-shape: Change the cursor shape under iTerm2
-# escape sequence: `^[]1337;CursorShape=N^G`. N=1, vertical line, N=0, block.
+# escape sequence: `^[]1337;CursorShape=N^G`. where:
+# N=0: block;
+# N=1: vertical line;
+# N=2: underline
 # ^G = \x7
 # ˆ[ = \e
 # Tmux escape sequence example: "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
 # Normal shell escape sequence example: "\e]1337;CursorShape=1\x7"
-# more info here://www.iterm2.com/documentation-escape-codes.html
+# more info here http://www.iterm2.com/documentation-escape-codes.html
 nin-cursor-shape() {
   local tmuxescape="\ePtmux;\e\e]1337;CursorShape=${1}\x7\e\\"
   local normalescape="\e]1337;CursorShape=${1}\x7"
