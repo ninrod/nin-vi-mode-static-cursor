@@ -1,12 +1,9 @@
-# no delays for mode switching.{{{
-
-export KEYTIMEOUT=5
-
-# }}}
-# zle-keymap-select and bootstrap: Updates editor information when the keymap changes {{{
+# helper functions {{{
 
 # nin-cursor-shape: Change the cursor shape under iTerm2
 # escape sequence: `^[]1337;CursorShape=N^G`. N=1, vertical line, N=0, block.
+# ^G = \x7
+# ˆ[ = \e
 # Tmux escape sequence example: "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
 # Normal shell escape sequence example: "\e]1337;CursorShape=1\x7"
 # more info here://www.iterm2.com/documentation-escape-codes.html
@@ -19,6 +16,9 @@ nin-cursor-shape() {
     echo -ne $normalescape
   fi
 }
+
+# }}}
+# bootstrap, keymap-select and cursor shape management {{{
 
 # Oliver Kiddle <opk@zsh.org> optimization:
 # If you change the cursor shape, consider taking care to reset it when
@@ -44,7 +44,6 @@ nin-accept-line() {
   nin-cursor-shape 0
   zle .accept-line
 }
-
 zle -N nin-accept-line
 # ^J and ^M are the same as <cr>
 bindkey "^@" nin-accept-line
@@ -62,6 +61,9 @@ TRAPWINCH() {
   zle && { zle reset-prompt; zle -R }
 }
 
+# no delays when switching keymaps
+export KEYTIMEOUT=5
+# bootstrap vi-mode
 bindkey -v
 
 # }}}
@@ -174,7 +176,6 @@ bindkey -M visual 'U' vi-uppercase
 # various escape code fixes {{{
 
 # home, end, delete and backspace
-
 bindkey "^[[1~" beginning-of-line # home key
 bindkey "^[[4~" end-of-line # end key
 bindkey "^[[3~" delete-char # delete key
