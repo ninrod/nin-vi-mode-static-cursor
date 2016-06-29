@@ -36,24 +36,31 @@ function zle-keymap-select() {
 zle -N zle-keymap-select
 
 # fix cursor shape to block
-zle-line-init() {
-  if [[ -n ${TMUX+x} ]]; then
-    echo -ne "\ePtmux;\e\e]1337;CursorShape=0\x7\e\\"
-  else
-    echo -ne "\e]1337;CursorShape=0\x7"
-  fi
-}
-zle -N zle-line-init
 
-# fix cursor shape to block
-zle-line-finish() {
+nin-cursor-block-shape() {
   if [[ -n ${TMUX+x} ]]; then
     echo -ne "\ePtmux;\e\e]1337;CursorShape=0\x7\e\\"
   else
     echo -ne "\e]1337;CursorShape=0\x7"
   fi
 }
-zle -N zle-line-finish
+
+# when we hit <cr> return cursor shape to block
+nin-accept-line() {
+  nin-cursor-block-shape
+  zle .accept-line
+}
+zle -N nin-accept-line
+# ^J and ^M are the same as <cr>
+bindkey "^@" nin-accept-line
+bindkey "^J" nin-accept-line
+bindkey "^M" nin-accept-line
+
+# when we cancel the current command, return the cursor shape to block
+TRAPINT() {
+  nin-cursor-block-shape
+  return $(( 128 + $1 ))
+}
 
 # Ensure that the prompt is redrawn when the terminal size changes.
 TRAPWINCH() {
@@ -172,6 +179,7 @@ bindkey -M visual 'U' vi-uppercase
 # various escape code fixes {{{
 
 # home, end, delete and backspace
+
 bindkey "^[[1~" beginning-of-line # home key
 bindkey "^[[4~" end-of-line # end key
 bindkey "^[[3~" delete-char # delete key
