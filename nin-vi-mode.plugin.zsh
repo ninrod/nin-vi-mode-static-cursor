@@ -5,51 +5,46 @@ export KEYTIMEOUT=5
 # }}}
 # zle-keymap-select and bootstrap: Updates editor information when the keymap changes {{{
 
+# nin-cursor-shape: Change the cursor shape under iTerm2
+# escape sequence: `^[]1337;CursorShape=N^G`. N=1, vertical line, N=0, block.
+# Tmux escape sequence example: "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
+# Normal shell escape sequence example: "\e]1337;CursorShape=1\x7"
+# more info here://www.iterm2.com/documentation-escape-codes.html
+nin-cursor-shape() {
+  local tmuxescape="\ePtmux;\e\e]1337;CursorShape=${1}\x7\e\\"
+  local normalescape="\e]1337;CursorShape=${1}\x7"
+  if [[ -n ${TMUX+x} ]]; then
+    echo -ne $tmuxescape
+  else
+    echo -ne $normalescape
+  fi
+}
+
 # Oliver Kiddle <opk@zsh.org> optimization:
 # If you change the cursor shape, consider taking care to reset it when
 # not in ZLE. zle-line-finish is only run when ZLE is succcessful so the
 # best place for the reset is in POSTEDIT:
-
-# for the iTerm2 terminal
-# escape sequence: `^[]1337;CursorShape=N^G`. N=1, vertical line, N=0, block.
-# more info here://www.iterm2.com/documentation-escape-codes.html
 POSTEDIT+=$'\e]1337;CursorShape=0\x7'
+
+# manage cursor shape under different keymaps
 function zle-keymap-select() {
-  if [[ -n ${TMUX+x} ]]; then
-    if [[ $KEYMAP = vicmd ]]; then
-      # the command mode for vi: block shape
-      echo -ne "\ePtmux;\e\e]1337;CursorShape=0\x7\e\\"
-    else
-      # the insert mode for vi: line shape
-      echo -ne "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
-    fi
-  elif [[ $KEYMAP = vicmd ]]; then
-    # the command mode for vi: block shape
-    echo -ne "\e]1337;CursorShape=0\x7"
-  else
-    # the insert mode for vi: line shape
-    echo -ne "\e]1337;CursorShape=1\x7"
+  if [[ $KEYMAP = vicmd ]]; then
+    nin-cursor-shape 0
+  elif [[ $KEYMAP = main ]]; then
+    nin-cursor-shape 1
   fi
-  zle reset-prompt
+  # reset prompt if you use keymap mode indication
+  # zle reset-prompt
   zle -R
 }
 zle -N zle-keymap-select
 
-# fix cursor shape to block
-
-nin-cursor-block-shape() {
-  if [[ -n ${TMUX+x} ]]; then
-    echo -ne "\ePtmux;\e\e]1337;CursorShape=0\x7\e\\"
-  else
-    echo -ne "\e]1337;CursorShape=0\x7"
-  fi
-}
-
 # when we hit <cr> return cursor shape to block
 nin-accept-line() {
-  nin-cursor-block-shape
+  nin-cursor-shape 0
   zle .accept-line
 }
+
 zle -N nin-accept-line
 # ^J and ^M are the same as <cr>
 bindkey "^@" nin-accept-line
@@ -58,7 +53,7 @@ bindkey "^M" nin-accept-line
 
 # when we cancel the current command, return the cursor shape to block
 TRAPINT() {
-  nin-cursor-block-shape
+  nin-cursor-shape 0
   return $(( 128 + $1 ))
 }
 
