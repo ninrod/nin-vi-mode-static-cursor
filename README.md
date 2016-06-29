@@ -1,4 +1,4 @@
-# nin-vi-mode
+# NIN-VI-MODE
 
 This plugin increases ZLE, the zsh line editor, `vi-like` capabilities.
 
@@ -6,7 +6,7 @@ This plugin increases ZLE, the zsh line editor, `vi-like` capabilities.
 
 Type a word, `<esc>`, and `gUiw`. Yes, it works.
 
-## install
+## Install
 
 Recommended method: [zplug](http://github.com/zplug/zplug). just add this to your `.zshrc`:
 
@@ -16,10 +16,9 @@ zplug "ninrod/nin-vi-mode"
 
 ## Mode indicators
 
-I provide none. Too distracting. 
-The only indicator you'll have will be the cursor shape dynamic behaviour. 
-It's a block in normal mode and a line shape in insert mode.
+I provide none. I find it too distracting. The only indicator you'll have will be the cursor shape.
 
+It's a block in normal mode and a line shape in insert mode.
 
 ## Vim edition: for when things get hairy
 
