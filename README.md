@@ -22,4 +22,4 @@ It's a block in normal mode and a line shape in insert mode.
 
 ## Vim edition: for when things get hairy
 
-I've bound `gs` to fire up `vim` so you can edit your command with full vimmic powers.
+I've bound normal mode `gs` to fire up `vim` so you can edit your command with full vimmic powers.
