@@ -56,6 +56,30 @@ nin-cursor-shape-mintty-underscore() {
   nin-cursor-shape-mintty 4
 }
 
+nin-cursor-shape-block() {
+  if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
+    nin-cursor-shape-mintty-block
+  else
+    nin-cursor-shape-iterm2-block
+  fi
+}
+
+nin-cursor-shape-line() {
+  if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
+    nin-cursor-shape-mintty-line
+  else
+    nin-cursor-shape-iterm2-line
+  fi
+}
+
+nin-cursor-shape-underscore() {
+  if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
+    nin-cursor-shape-mintty-underscore
+  else
+    nin-cursor-shape-iterm2-underscore
+  fi
+}
+
 # }}}
 # bootstrap, keymap-select and cursor shape management {{{
 
@@ -68,13 +92,9 @@ POSTEDIT+=$'\e]1337;CursorShape=0\x7'
 # manage cursor shape under different keymaps on iTerm2
 function zle-keymap-select() {
   if [[ $KEYMAP = vicmd ]]; then
-    if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
-      nin-cursor-shape-mintty-block
-    else
-      nin-cursor-shape-iterm2-block
-    fi
+    nin-cursor-shape-block
   elif [[ $KEYMAP = main ]]; then
-    nin-cursor-shape-iterm2-line
+    nin-cursor-shape-line
   fi
   # reset prompt if you use keymap mode indication
   # zle reset-prompt
@@ -84,7 +104,7 @@ zle -N zle-keymap-select
 
 # when we hit <cr> return cursor shape to block
 nin-accept-line() {
-  nin-cursor-shape-iterm2-block
+  nin-cursor-shape-block
   zle .accept-line
 }
 zle -N nin-accept-line
@@ -95,7 +115,7 @@ bindkey "^M" nin-accept-line
 
 # when we cancel the current command, return the cursor shape to block
 TRAPINT() {
-  nin-cursor-shape-iterm2-block
+  nin-cursor-shape-block
   return $(( 128 + $1 ))
 }
 
