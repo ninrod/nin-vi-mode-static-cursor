@@ -77,7 +77,6 @@ nin-cursor-shape-block() {
     nin-cursor-shape-iterm2-block
   fi
 }
-
 nin-cursor-shape-line() {
   if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
     nin-cursor-shape-mintty-line
@@ -85,7 +84,6 @@ nin-cursor-shape-line() {
     nin-cursor-shape-iterm2-line
   fi
 }
-
 nin-cursor-shape-underscore() {
   if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
     nin-cursor-shape-mintty-underscore
@@ -106,7 +104,7 @@ POSTEDIT+=$'\e]1337;CursorShape=0\x7'
 # manage cursor shape under different keymaps on iTerm2
 function zle-keymap-select() {
   if [[ $KEYMAP = vicmd ]]; then
-    nin-cursor-shape-block
+    nin-cursor-shape-underscore
   elif [[ $KEYMAP = main ]]; then
     nin-cursor-shape-line
   fi
@@ -122,15 +120,19 @@ nin-accept-line() {
   zle .accept-line
 }
 zle -N nin-accept-line
+
 # ^J and ^M are the same as <cr>
 bindkey "^@" nin-accept-line
 bindkey "^J" nin-accept-line
 bindkey "^M" nin-accept-line
+bindkey -M vicmd "^@" nin-accept-line
+bindkey -M vicmd "^J" nin-accept-line
+bindkey -M vicmd "^M" nin-accept-line
 
 # when we cancel the current command, return the cursor shape to block
 TRAPINT() {
   nin-cursor-shape-block
-  print -n "${Purple}[${Cyan}ctrl-c${Purple}]${Rst}"
+  print -n " ${Purple}[${Cyan}ctrl-c${Purple}]${Rst}"
   return $(( 128 + $1 ))
 }
 
