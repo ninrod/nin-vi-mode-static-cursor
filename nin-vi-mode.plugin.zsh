@@ -3,8 +3,8 @@
 # nin-cursor-shape: Change the cursor shape under iTerm2
 # escape sequence: `^[]1337;CursorShape=N^G`. where:
 # N=0: block;
-# N=1: vertical line;
-# N=2: underline
+# N=1: line;
+# N=2: underline;
 # ^G = \x7
 # ˆ[ = \e
 # Tmux escape sequence example: "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
@@ -19,10 +19,20 @@ nin-cursor-shape-iterm2() {
     echo -ne $normalescape
   fi
 }
+nin-cursor-shape-iterm2-block() {
+  nin-cursor-shape-iterm2 0
+}
+nin-cursor-shape-iterm2-line() {
+  nin-cursor-shape-iterm2 1
+}
+nin-cursor-shape-iterm2-underscore() {
+  nin-cursor-shape-iterm2 2
+}
 
 # mintty terminal cursor shape support
 # parameters ($1)
   # block shape: 2
+  # underline: 4
   # line shape: 6
 # tmux escape string: echo -ne "\ePtmux;\e\e[2 q\e\\"
 # normal escape string: echo -ne "\e[6 q"
@@ -35,6 +45,15 @@ nin-cursor-shape-mintty() {
   else
     echo -ne $normalescape
   fi
+}
+nin-cursor-shape-mintty-block() {
+  nin-cursor-shape-mintty 2
+}
+nin-cursor-shape-mintty-line() {
+  nin-cursor-shape-mintty 6
+}
+nin-cursor-shape-mintty-underscore() {
+  nin-cursor-shape-mintty 4
 }
 
 # }}}
@@ -49,9 +68,13 @@ POSTEDIT+=$'\e]1337;CursorShape=0\x7'
 # manage cursor shape under different keymaps on iTerm2
 function zle-keymap-select() {
   if [[ $KEYMAP = vicmd ]]; then
-    nin-cursor-shape-iterm2 0
+    if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
+      nin-cursor-shape-mintty-block
+    else
+      nin-cursor-shape-iterm2-block
+    fi
   elif [[ $KEYMAP = main ]]; then
-    nin-cursor-shape-iterm2 1
+    nin-cursor-shape-iterm2-line
   fi
   # reset prompt if you use keymap mode indication
   # zle reset-prompt
@@ -61,7 +84,7 @@ zle -N zle-keymap-select
 
 # when we hit <cr> return cursor shape to block
 nin-accept-line() {
-  nin-cursor-shape-iterm2 0
+  nin-cursor-shape-iterm2-block
   zle .accept-line
 }
 zle -N nin-accept-line
@@ -72,7 +95,7 @@ bindkey "^M" nin-accept-line
 
 # when we cancel the current command, return the cursor shape to block
 TRAPINT() {
-  nin-cursor-shape-iterm2 0
+  nin-cursor-shape-iterm2-block
   return $(( 128 + $1 ))
 }
 
