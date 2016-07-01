@@ -108,8 +108,8 @@ function zle-keymap-select() {
   elif [[ $KEYMAP = main ]]; then
     nin-cursor-shape-line
   fi
-  # reset prompt if you use keymap mode indication
-  # zle reset-prompt
+
+  zle reset-prompt
   zle -R
 }
 zle -N zle-keymap-select
