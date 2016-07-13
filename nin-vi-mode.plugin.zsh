@@ -99,7 +99,11 @@ nin-cursor-shape-underscore() {
 # If you change the cursor shape, consider taking care to reset it when
 # not in ZLE. zle-line-finish is only run when ZLE is succcessful so the
 # best place for the reset is in POSTEDIT:
-POSTEDIT+=$'\e]1337;CursorShape=0\x7'
+if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
+  POSTEDIT+=$'\e[2 q'
+else
+  POSTEDIT+=$'\e]1337;CursorShape=0\x7'
+fi
 
 # manage cursor shape under different keymaps on iTerm2
 function zle-keymap-select() {
@@ -242,9 +246,9 @@ vi-uppercase() {
   CURSOR="$save_cur"
 }
 
+# can safely disable this after commit zsh commit #a73ae70 (zsh-5.2-301-ga73ae70)
 zle -N vi-lowercase
 zle -N vi-uppercase
-
 bindkey -a 'gU' vi-uppercase
 bindkey -a 'gu' vi-lowercase
 bindkey -M visual 'u' vi-lowercase
