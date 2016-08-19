@@ -12,130 +12,17 @@ Cyan="${TC}36m";
 White="${TC}37m";
 
 # }}}
-# helper functions {{{
-
-# nin-cursor-shape: Change the cursor shape under iTerm2
-# escape sequence: `^[]1337;CursorShape=N^G`. where:
-# N=0: block;
-# N=1: line;
-# N=2: underline;
-# ^G = \x7
-# ˆ[ = \e
-# Tmux escape sequence example: "\ePtmux;\e\e]1337;CursorShape=1\x7\e\\"
-# Normal shell escape sequence example: "\e]1337;CursorShape=1\x7"
-# more info here http://www.iterm2.com/documentation-escape-codes.html
-nin-cursor-shape-iterm2() {
-  local tmuxescape="\ePtmux;\e\e]1337;CursorShape=${1}\x7\e\\"
-  local normalescape="\e]1337;CursorShape=${1}\x7"
-  if [[ -n ${TMUX+x} ]]; then
-    echo -ne $tmuxescape
-  else
-    echo -ne $normalescape
-  fi
-}
-nin-cursor-shape-iterm2-block() {
-  nin-cursor-shape-iterm2 0
-}
-nin-cursor-shape-iterm2-line() {
-  nin-cursor-shape-iterm2 1
-}
-nin-cursor-shape-iterm2-underscore() {
-  nin-cursor-shape-iterm2 2
-}
-
-# mintty terminal cursor shape support
-# parameters ($1)
-  # block shape: 2
-  # underline: 4
-  # line shape: 6
-# tmux escape string: echo -ne "\ePtmux;\e\e[2 q\e\\"
-# normal escape string: echo -ne "\e[6 q"
-# more info: https://github.com/mintty/mintty/wiki/CtrlSeqs#cursor-style
-nin-cursor-shape-mintty() {
-  local tmuxescape="\ePtmux;\e\e[${1} q\e\\"
-  local normalescape="\e[${1} q"
-  if [[ -n ${TMUX+x} ]]; then
-    echo -ne $tmuxescape
-  else
-    echo -ne $normalescape
-  fi
-}
-nin-cursor-shape-mintty-block() {
-  nin-cursor-shape-mintty 2
-}
-nin-cursor-shape-mintty-line() {
-  nin-cursor-shape-mintty 6
-}
-nin-cursor-shape-mintty-underscore() {
-  nin-cursor-shape-mintty 4
-}
-
-nin-cursor-shape-block() {
-  if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
-    nin-cursor-shape-mintty-block
-  else
-    nin-cursor-shape-iterm2-block
-  fi
-}
-nin-cursor-shape-line() {
-  if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
-    nin-cursor-shape-mintty-line
-  else
-    nin-cursor-shape-iterm2-line
-  fi
-}
-nin-cursor-shape-underscore() {
-  if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
-    nin-cursor-shape-mintty-underscore
-  else
-    nin-cursor-shape-iterm2-underscore
-  fi
-}
-
-# }}}
 # bootstrap, keymap-select and cursor shape management {{{
-
-# Oliver Kiddle <opk@zsh.org> optimization:
-# If you change the cursor shape, consider taking care to reset it when
-# not in ZLE. zle-line-finish is only run when ZLE is succcessful so the
-# best place for the reset is in POSTEDIT:
-if [[ -n ${DOT_TERMINAL_EMULATOR+x} ]] && [[ $DOT_TERMINAL_EMULATOR = 'mintty' ]]; then
-  POSTEDIT+=$'\e[2 q'
-else
-  POSTEDIT+=$'\e]1337;CursorShape=0\x7'
-fi
 
 # manage cursor shape under different keymaps on iTerm2
 function zle-keymap-select() {
-  if [[ $KEYMAP = vicmd ]]; then
-    nin-cursor-shape-underscore
-  elif [[ $KEYMAP = main ]]; then
-    nin-cursor-shape-line
-  fi
-
   zle reset-prompt
   zle -R
 }
 zle -N zle-keymap-select
 
-# when we hit <cr> return cursor shape to block
-nin-accept-line() {
-  nin-cursor-shape-block
-  zle .accept-line
-}
-zle -N nin-accept-line
-
-# ^J and ^M are the same as <cr>
-bindkey "^@" nin-accept-line
-bindkey "^J" nin-accept-line
-bindkey "^M" nin-accept-line
-bindkey -M vicmd "^@" nin-accept-line
-bindkey -M vicmd "^J" nin-accept-line
-bindkey -M vicmd "^M" nin-accept-line
-
 # when we cancel the current command, return the cursor shape to block
 TRAPINT() {
-  nin-cursor-shape-block
   print -n " ${Purple}[${Cyan}ctrl-c${Purple}]${Rst}"
   return $(( 128 + $1 ))
 }
@@ -152,6 +39,7 @@ bindkey -v
 
 # }}}
 # text objects support {{{
+
 # since zsh 5.0.8, text objects were introduced. Let's use some of them.
 # see here for more info: http://www.zsh.org/mla/workers/2015/msg01017.html
 # and here: https://github.com/zsh-users/zsh/commit/d257f0143e69c3724466c4c92f59538d2f3fffd1
